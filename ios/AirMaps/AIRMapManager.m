@@ -460,7 +460,7 @@ static int kDragCenterContext;
         region.span.latitudeDelta = AIRMapDefaultSpan;
         region.span.longitudeDelta = AIRMapDefaultSpan;
         region.center = location.coordinate;
-        [mapView setRegion:region animated:YES];
+        [mapView setRegion:region animated:NO];
 
         // Move to user location only for the first time it loads up.
         mapView.followUserLocation = NO;
