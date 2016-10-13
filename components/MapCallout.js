@@ -34,7 +34,7 @@ var MapCallout = React.createClass({
 
 var styles = StyleSheet.create({
   callout: {
-    position: 'absolute',
+    position: 'relative',
     //flex: 0,
     //backgroundColor: 'transparent',
   },
