@@ -15,17 +15,17 @@ add native dependencies automatically then continue the directions below dependi
 
 ## iOS
 
-### Option 1: Cocoapods - Same as the included AirMapsExplorer example
+### Option 1: CocoaPods - Same as the included AirMapsExplorer example
 
 1. Setup your `Podfile` like the included [example/ios/Podfile](../example/ios/Podfile)  then run `pod install`.
    (If you do not need `GoogleMaps` support for iOS, then you can probably completely skip this step.)
-1. Open your project in xCode workspace
+1. Open your project in Xcode workspace
 1. Drag the following folder into your project:
     - `node_modules/react-native-maps/ios/AirMaps/`
 1. If you need `GoogleMaps` support also drag this folder into your project:
     - `node_modules/react-native-maps/ios/AirGoogleMaps/`
 
-### Option 2: Cocoapods -- Untested Way
+### Option 2: CocoaPods -- Untested Way
 NOTE: If you actually get this to work, please open an issue to let us know.
 This is now considered the **old way** because it is untested and if it does work at all, it
 will only work if you **don't** have `use_frameworks!` in your `Podfile`
@@ -44,13 +44,13 @@ Now if you need `GoogleMaps` support you will also have to add a bunch of other 
 After your `Podfile` is setup properly, run `pod install`.
 
 ### Option 3: Manually
-1. Open your project in XCode, right click on `Libraries` and click `Add
+1. Open your project in Xcode, right click on `Libraries` and click `Add
    Files to "Your Project Name"` Look under `node_modules/react-native-maps/ios` and add `AIRMaps.xcodeproj`.
 1. Add `libAIRMaps.a` to `Build Phases -> Link Binary With Libraries.
 1. Click on `AIRMaps.xcodeproj` in `Libraries` and go the `Build
    Settings` tab. Double click the text to the right of `Header Search
    Paths` and verify that it has `$(SRCROOT)/../../react-native/React` as well as `$(SRCROOT)/../../react-native/Libraries/Image` - if they
-   aren't, then add them. This is so XCode is able to find the headers that
+   aren't, then add them. This is so Xcode is able to find the headers that
    the `AIRMaps` source files are referring to by pointing to the
    header files installed within the `react-native` `node_modules`
    directory.
@@ -76,7 +76,7 @@ After your `Podfile` is setup properly, run `pod install`.
    ```
 
 1. Specify your Google Maps API Key:
-    > To develop is recommended a ***Browser Key*** without refeer restriction. Go to https://console.developers.google.com/apis/credentials to check your credentials.
+    > For development, it is recommended to use a ***Browser Key*** without referrer restrictions. Go to https://console.developers.google.com/apis/credentials to check your credentials.
 
    Add your **Browser** API key to your manifest file (`android\app\src\main\AndroidManifest.xml`):
 
@@ -85,10 +85,10 @@ After your `Podfile` is setup properly, run `pod install`.
        <!-- You will only need to add this meta-data tag, but make sure it's a child of application -->
        <meta-data
          android:name="com.google.android.geo.API_KEY"
-         android:value="{{Your Google maps API Key Here}}"/>
+         android:value="Your Google maps API Key Here"/>
    </application>
    ```
-    > If that doesn't work try using an ***Android Key*** without refeer restriction. Go to https://console.developers.google.com/apis/credentials to check your credentials.
+    > If that doesn't work, try using an ***Android Key*** without referrer restrictions. Go to https://console.developers.google.com/apis/credentials to check your credentials.
 
    Add your **Android** API key to your manifest file:
 
@@ -100,6 +100,8 @@ After your `Podfile` is setup properly, run `pod install`.
            android:value="{{@string/ANDROID_GOOGLE_MAPS_API_KEY}}"/>
    </application>
    ```
+   > Note: As shown above, com.google.android.geo.API_KEY is the recommended metadata name for the API key. A key with this name can be used to authenticate to multiple Google Maps-based APIs on the Android platform, including the Google Maps Android API. For backwards compatibility, the API also supports the name com.google.android.maps.v2.API_KEY. This legacy name allows authentication to the Android Maps API v2 only. An application can specify only one of the API key metadata names. If both are specified, the API throws an exception.
+Source: https://developers.google.com/maps/documentation/android-api/signup
 
 1. Ensure that you have Google Play Services installed:
   * For Genymotion you can follow [these instructions](http://stackoverflow.com/a/20137324/1424349).

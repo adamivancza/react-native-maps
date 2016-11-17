@@ -32,7 +32,7 @@ const MAP_TYPES = {
   NONE: 'none',
 };
 
-const ANDROID_ONLY_MAP_TYPES = [
+const GOOGLE_MAPS_ONLY_TYPES = [
   MAP_TYPES.TERRAIN,
   MAP_TYPES.NONE,
 ];
@@ -168,6 +168,14 @@ const propTypes = {
   toolbarEnabled: PropTypes.bool,
 
   /**
+   * A Boolean indicating whether on marker press the map will move to the pressed marker
+   * Default value is `true`
+   *
+   * @platform android
+   */
+  moveOnMarkerPress: PropTypes.bool,
+
+  /**
    * A Boolean indicating whether the map shows scale information.
    * Default value is `false`
    *
@@ -200,7 +208,8 @@ const propTypes = {
    * - standard: standard road map (default)
    * - satellite: satellite view
    * - hybrid: satellite view with roads and points of interest overlayed
-   * - terrain: (Android only) topographic view
+   * - terrain: topographic view
+   * - none: no base map
    */
   mapType: PropTypes.oneOf(Object.values(MAP_TYPES)),
 
@@ -362,15 +371,6 @@ class MapView extends React.Component {
     return { provider: this.props.provider };
   }
 
-  componentDidMount() {
-    const { region, initialRegion } = this.props;
-    if (region && this.state.isReady) {
-      this.map.setNativeProps({ region });
-    } else if (initialRegion && this.state.isReady) {
-      this.map.setNativeProps({ region: initialRegion });
-    }
-  }
-
   componentWillUpdate(nextProps) {
     const a = this.__lastRegion;
     const b = nextProps.region;
@@ -398,6 +398,8 @@ class MapView extends React.Component {
   _onLayout(e) {
     const { region, initialRegion, onLayout } = this.props;
     const { isReady } = this.state;
+    const { layout } = e.nativeEvent;
+    if (!layout.width || !layout.height) return;
     if (region && isReady && !this.__layoutCalled) {
       this.__layoutCalled = true;
       this.map.setNativeProps({ region });
@@ -494,8 +496,9 @@ class MapView extends React.Component {
         onMapReady: this._onMapReady,
         onLayout: this._onLayout,
       };
-      if (Platform.OS === 'ios' && ANDROID_ONLY_MAP_TYPES.includes(props.mapType)) {
-        props.mapType = MAP_TYPES.STANDARD;
+      if (Platform.OS === 'ios' && props.provider === ProviderConstants.PROVIDER_DEFAULT
+        && GOOGLE_MAPS_ONLY_TYPES.includes(props.mapType)) {
+        props.mapType = MAP_TYPES.standard;
       }
       props.handlePanDrag = !!props.onPanDrag;
     } else {
