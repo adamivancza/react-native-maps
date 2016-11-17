@@ -1,45 +1,50 @@
-var React = require('react');
-var ReactNative = require('react-native');
-var {
+import React, { PropTypes } from 'react';
+import {
   StyleSheet,
-  PropTypes,
   View,
   Text,
   Dimensions,
-  TouchableOpacity,
   ScrollView,
-} = ReactNative;
+} from 'react-native';
+import MapView from 'react-native-maps';
+import PriceMarker from './PriceMarker';
 
-var MapView = require('react-native-maps');
-var PriceMarker = require('./PriceMarker');
-
-var { width, height } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 const ASPECT_RATIO = width / height;
 const LATITUDE = 37.78825;
 const LONGITUDE = -122.4324;
 const LATITUDE_DELTA = 0.0922;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
-var id = 0;
+let id = 0;
 
-var Event = React.createClass({
+class Event extends React.Component {
   shouldComponentUpdate(nextProps) {
     return this.props.event.id !== nextProps.event.id;
-  },
+  }
+
   render() {
-    var { event } = this.props;
+    const { event } = this.props;
     return (
       <View style={styles.event}>
         <Text style={styles.eventName}>{event.name}</Text>
         <Text style={styles.eventData}>{JSON.stringify(event.data, null, 2)}</Text>
       </View>
     );
-  },
-});
+  }
+}
 
-var DisplayLatLng = React.createClass({
-  getInitialState() {
-    return {
+Event.propTypes = {
+  event: PropTypes.object,
+};
+
+
+// eslint-disable-next-line react/no-multi-comp
+class EventListener extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
       region: {
         latitude: LATITUDE,
         longitude: LONGITUDE,
@@ -48,19 +53,19 @@ var DisplayLatLng = React.createClass({
       },
       events: [],
     };
-  },
+  }
 
   makeEvent(e, name) {
     return {
       id: id++,
-      name: name,
+      name,
       data: e.nativeEvent ? e.nativeEvent : e,
     };
-  },
+  }
 
   recordEvent(name) {
     return e => {
-      var { events } = this.state;
+      const { events } = this.state;
       this.setState({
         events: [
           this.makeEvent(e, name),
@@ -68,13 +73,13 @@ var DisplayLatLng = React.createClass({
         ],
       });
     };
-  },
+  }
 
   render() {
     return (
       <View style={styles.container}>
         <MapView
-          ref="map"
+          provider={this.props.provider}
           style={styles.map}
           initialRegion={this.state.region}
           onRegionChange={this.recordEvent('Map::onRegionChange')}
@@ -88,6 +93,20 @@ var DisplayLatLng = React.createClass({
           onCalloutPress={this.recordEvent('Map::onCalloutPress')}
         >
           <MapView.Marker
+            coordinate={{
+              latitude: LATITUDE + (LATITUDE_DELTA / 2),
+              longitude: LONGITUDE + (LONGITUDE_DELTA / 2),
+            }}
+          />
+          <MapView.Marker
+            coordinate={{
+              latitude: LATITUDE - (LATITUDE_DELTA / 2),
+              longitude: LONGITUDE - (LONGITUDE_DELTA / 2),
+            }}
+          />
+          <MapView.Marker
+            title="This is a title"
+            description="This is a description"
             coordinate={this.state.region}
             onPress={this.recordEvent('Marker::onPress')}
             onSelect={this.recordEvent('Marker::onSelect')}
@@ -112,16 +131,19 @@ var DisplayLatLng = React.createClass({
         </View>
       </View>
     );
-  },
-});
+  }
+}
 
-var styles = StyleSheet.create({
+EventListener.propTypes = {
+  provider: MapView.ProviderPropType,
+};
+
+const styles = StyleSheet.create({
+  callout: {
+    width: 60,
+  },
   container: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
+    ...StyleSheet.absoluteFillObject,
     justifyContent: 'flex-end',
     alignItems: 'center',
   },
@@ -177,4 +199,4 @@ var styles = StyleSheet.create({
   },
 });
 
-module.exports = DisplayLatLng;
+module.exports = EventListener;

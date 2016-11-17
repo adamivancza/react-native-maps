@@ -1,10 +1,12 @@
-# react-native-maps
+# react-native-maps [![npm version](https://img.shields.io/npm/v/react-native-maps.svg?style=flat)](https://www.npmjs.com/package/react-native-maps)
 
 React Native Map components for iOS + Android
 
 ## Installation
 
 See [Installation Instructions](docs/installation.md).
+
+See [Setup Instructions for the Included Example Project](docs/examples-setup.md).
 
 ## Compatibility
 
@@ -240,6 +242,11 @@ Markers are draggable, and emit continuous drag events to update other UI during
 
 ![](http://i.giphy.com/l2JImnZxdv1WbpQfC.gif) ![](http://i.giphy.com/l2JIhv4Jx6Ugx1EGI.gif)
 
+### Lite Mode ( Android )
+
+Enable lite mode on Android with `liteMode` prop. Ideal when having multiple maps in a View or ScrollView.
+
+![](http://i.giphy.com/qZ2lAf18s89na.gif)
 
 ## Component API
 
@@ -256,25 +263,16 @@ Markers are draggable, and emit continuous drag events to update other UI during
 [`<MapView.Circle />` Component API](docs/circle.md)
 
 
-
-## Using with the Animated API
-
-The API of this Map has been built with the intention of it being able to utilize the [Animated API](https://facebook.github.io/react-native/docs/animated.html).
-
-In order to get this to work, you will need to modify the `AnimatedImplementation.js` file in the
-source of react-native with [this one](https://gist.github.com/lelandrichardson/c0d938e02301f9294465).
-
-Ideally this will be possible in the near future without this modification.
-
 ### Animated Region
 
-The MapView can accept an `Animated.Region` value as its `region` prop. This allows you to utilize
-the Animated API to control the map's center and zoom.
+The MapView can accept an `MapView.AnimatedRegion` value as its `region` prop. This allows you to utilize the Animated API to control the map's center and zoom.
 
 ```jsx
+import MapView from 'react-native-maps';
+
 getInitialState() {
   return {
-    region: new Animated.Region({
+    region: new MapView.AnimatedRegion({
       latitude: LATITUDE,
       longitude: LONGITUDE,
       latitudeDelta: LATITUDE_DELTA,
@@ -299,16 +297,25 @@ render() {
 
 ### Animated Marker Position
 
-Markers can also accept an `Animated.Region` value as a coordinate.
+Markers can also accept an `AnimatedRegion` value as a coordinate.
 
 ```jsx
 getInitialState() {
   return {
-    coordinate: new Animated.Region({
+    coordinate: new MapView.AnimatedRegion({
       latitude: LATITUDE,
       longitude: LONGITUDE,
     }),
   };
+}
+
+componentWillReceiveProps(nextProps) {
+  if (this.props.coordinate !== nextProps.coordinate) {
+    this.state.coordinate.timing({
+      ...nextProps.coordinate,
+      duration: 500
+    }).start();
+  }
 }
 
 render() {
@@ -356,6 +363,18 @@ render() {
 }
 ```
 
+### Zoom to Specified Markers
+
+Pass an array of marker identifiers to have the map re-focus.
+
+![](http://i.giphy.com/3o7qEbOQnO0yoXqKJ2.gif) ![](http://i.giphy.com/l41YdrQZ7m6Dz4h0c.gif)
+
+### Zoom to Specified Coordinates
+
+Pass an array of coordinates to focus a map region on said coordinates.
+
+![](https://cloud.githubusercontent.com/assets/1627824/18609960/da5d9e06-7cdc-11e6-811e-34e255093df9.gif)
+
 ### Troubleshooting
 
 #### My map is blank
@@ -367,11 +386,7 @@ render() {
 ```javascript
 const styles = StyleSheet.create({
   map: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
+    ...StyleSheet.absoluteFillObject,
   },
 });
 ```
@@ -415,7 +430,7 @@ License
      you may not use this file except in compliance with the License.
      You may obtain a copy of the License at
 
-        https://raw.githubusercontent.com/lelandrichardson/react-native-maps/master/LICENSE
+        https://raw.githubusercontent.com/airbnb/react-native-maps/master/LICENSE
 
      Unless required by applicable law or agreed to in writing, software
      distributed under the License is distributed on an "AS IS" BASIS,
